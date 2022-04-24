@@ -26,18 +26,19 @@
 
 using namespace std;
 
+// 重新定義整數類別
 class Integer {
     private:
-        std::string value;
-        int fillZero(std::string&, std::string&);
+        string value;
+        int fillZero(string&, string&);
         Integer div(Integer, Integer, bool);
     public:
-        Integer(std::string);
-        friend std::ostream& operator<<(std::ostream&, const Integer&);
+        Integer(string);
+        friend ostream& operator<<(ostream&, const Integer&);
         
         bool operator<(Integer); // compare
         bool operator>(Integer); // compare
-        Integer& operator+=(Integer);
+
         Integer operator+(Integer);
         Integer operator-(Integer);
         Integer operator*(Integer);
@@ -45,7 +46,8 @@ class Integer {
         Integer operator%(Integer);
 };
 
-int Integer::fillZero(std::string& a, std::string& b) {
+// 兩整數加減，比較短的那個整數要補零，使得兩整數能相減。
+int Integer::fillZero(string& a, string& b) {
     int max = a.size();
     if (a.size() != b.size()) {
         max = a.size() > b.size()
@@ -65,10 +67,12 @@ int Integer::fillZero(std::string& a, std::string& b) {
     return max;
 }
 
-Integer::Integer(std::string value="0") {
+// Constructor
+Integer::Integer(string value="0") {
     this->value = value;
 }
 
+// 做除法，依造參數不同回傳餘數或商數
 Integer Integer::div(Integer a, Integer b, bool getRem) {
     vector<Integer> c;
     c.push_back(b);
@@ -100,11 +104,13 @@ Integer Integer::div(Integer a, Integer b, bool getRem) {
     else return division;
 }
 
-std::ostream& operator<<(std::ostream& o,const Integer& self) {
+// 多載 ostream 物件(cout...)
+ostream& operator<<(ostream& o,const Integer& self) {
     o << self.value;
     return o;
 }
 
+// 比大小
 bool Integer::operator<(const Integer other) {
     if (this->value.size() < other.value.size()) return true;
     else if (this->value.size() == other.value.size()) {
@@ -115,30 +121,33 @@ bool Integer::operator<(const Integer other) {
     } else return false;
 }
 
+// 比大小
 bool Integer::operator>(const Integer othter) {
     return !(*this < othter);
 }
 
+// 加法
 Integer Integer::operator+(Integer other) {
     Integer tmpThis = Integer(this->value);
     int max = fillZero(tmpThis.value, other.value);
     
     int carry = 0;
-    std::string tmp;
+    string tmp;
     for (int i = max - 1; i >= 0; i--) {
         int a = tmpThis.value[i] - '0';
         int b = other.value[i] - '0';
-        tmp = std::to_string((a+b+carry) % 10) + tmp;
+        tmp = to_string((a+b+carry) % 10) + tmp;
         carry = (a+b+carry) / 10;
     }
     
     if (carry != 0) {
-        tmp = std::to_string(carry) + tmp;
+        tmp = to_string(carry) + tmp;
     }
     
     return Integer(tmp);
 }
 
+// 乘法
 Integer Integer::operator*(Integer other) {
     Integer tmpThis = Integer(this->value);
     if (tmpThis.value == "0" || other.value == "0") return Integer("0");
@@ -186,6 +195,7 @@ Integer Integer::operator*(Integer other) {
     return total;
 }
 
+// 減法
 Integer Integer::operator-(Integer other) {
     if (this->value == other.value) return Integer("0");
     
@@ -234,13 +244,15 @@ Integer Integer::operator-(Integer other) {
     return Integer(tmp2);
 }
 
+// 除法
 Integer Integer::operator/(Integer other) {
     Integer tmpThis = Integer(this->value);
     
     return div(tmpThis, other, false);
 }
 
-Integer Integer::operator%(const Integer other) {
+// mod
+Integer Integer::operator%(Integer other) {
     Integer tmpThis = Integer(this->value);
     
     return div(tmpThis, other, true);
